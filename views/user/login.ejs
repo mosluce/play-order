@@ -1,0 +1,36 @@
+<html>
+<%- include ../partials/head.ejs %>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="panel panel-default">
+            <%if (typeof error !== 'undefined') { %>
+            <div class="panel-body">
+                <div class="label label-danger">
+                    <%- error.message %>
+                </div>
+            </div>
+            <% } %>
+            <div class="panel-body">
+                <form action="/user/login" method="post">
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input class="form-control" type="text" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input class="form-control" type="password" name="password">
+                    </div>
+                    <div class="form-group">
+                        <div class="btn-group">
+                            <input type="submit" class="btn btn-default" value="Login">
+                            <a href="/user/register" class="btn btn-info">Register</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
