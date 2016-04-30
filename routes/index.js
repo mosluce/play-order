@@ -6,6 +6,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.use('/order', require('./order'));
+router.use('/admin', require('./admin'));
 router.use('/user', require('./user'));
 
 module.exports = router;

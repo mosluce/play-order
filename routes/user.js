@@ -12,7 +12,7 @@ router.post('/login', function (req, res, next) {
     var phone = data.phone;
     var password = data.password;
 
-    models.vip.findOne({
+    models.Vip.findOne({
         phone: phone
     }).exec().then(function(user) {
         if(!user) {
@@ -60,7 +60,7 @@ router.post('/register', function (req, res, next) {
         });
     }
 
-    models.vip.findOne({
+    models.Vip.findOne({
         phone: phone
     }).exec().then(function (user) {
         if (user) {
@@ -72,7 +72,7 @@ router.post('/register', function (req, res, next) {
             });
         }
 
-        models.vip.create({
+        models.Vip.create({
             phone: phone,
             password: password,
             displayName: displayName

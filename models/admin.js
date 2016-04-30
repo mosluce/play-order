@@ -2,10 +2,13 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 module.exports = {
-    name: 'Vip',
+    name: 'Admin',
     schema: new Schema({
-        phone: String,
+        account: String,
         password: String,
-        displayName: String
+        root: {
+            type: Boolean,
+            default: false
+        }
     })
 };
