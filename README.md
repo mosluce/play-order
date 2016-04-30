@@ -13,3 +13,7 @@
     - 點餐1 - 選擇餐點及數量
     - 點餐2 - 結帳
     - 統計數據
+8. 強化登入功能
+    - 使用 Passport 進行基本驗證
+    - 使用 Facebook OAUTH 驗證
+    - 使用 Google OAUTH 驗證
