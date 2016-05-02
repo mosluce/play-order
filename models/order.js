@@ -6,11 +6,11 @@ module.exports = {
     schema: new Schema({
         vip: {
             type: Schema.Types.ObjectId,
-            ref: 'vip'
+            ref: 'Vip'
         },
         item: {
             type: Schema.Types.ObjectId,
-            ref: 'item'
+            ref: 'Item'
         },
         amount: {
             big: {

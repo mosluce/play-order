@@ -6,7 +6,9 @@ var auth = pipe.auth('/user/login');
 router.use('/', auth);
 
 router.get('/', function (req, res, next) {
-    res.send('hello order');
+    res.render('order', {
+        title: 'Order'
+    });
 });
 
 module.exports = router;

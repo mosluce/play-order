@@ -1,4 +1,5 @@
 module.exports = {
     auth: require('./auth'),
-    admin: require('./admin')
+    admin: require('./admin'),
+    flash: require('./flash')
 };

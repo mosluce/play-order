@@ -9,6 +9,16 @@ module.exports = {
             big: Number,
             small: Number
         },
-        photo: String
+        photo: String,
+        amount: {
+            big: {
+                type: Number,
+                default: 0
+            },
+            small: {
+                type: Number,
+                default: 0
+            }
+        }
     })
 };

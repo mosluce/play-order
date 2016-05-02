@@ -46,6 +46,11 @@
             </div>
             <% items.forEach(function(item) { %>
             <div class="row">
+                <form class="delform" action="/admin/item/delete/<%- item.id %>" method="post">
+                    <div class="col-sm-12 clearfix">
+                        <button class="btn btn-danger pull-right">Del</button>
+                    </div>
+                </form>
                 <form action="/admin/item/<%- item.id %>" method="post" enctype="multipart/form-data">
                     <div class="col-sm-3">
                         <img src="/photo/<%- item.id %>" style="width: 100%; height: 100px;">
@@ -60,11 +65,8 @@
                     <div class="col-sm-2">
                         <input type="text" name="priceSmall" class="form-control" value="<%- item.price.small %>">
                     </div>
-                    <div class="col-sm-2">
-                        <div class="btn-group">
-                            <button class="btn btn-default">Update</button>
-                            <a href="/admin/item/delete/<%- item.id %>" class="btn btn-danger">Del</a>
-                        </div>
+                    <div class="col-sm-2 clearfix">
+                        <button class="btn btn-default pull-right">Update</button>
                     </div>
                 </form>
             </div>
@@ -73,5 +75,16 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        var delform = $('.delform');
+
+        delform.submit(function () {
+            if (!confirm('Are You Sure?')) {
+                return false;
+            }
+        });
+    })
+</script>
 </body>
 </html>

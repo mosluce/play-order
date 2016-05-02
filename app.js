@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var flash = require('./pipe/flash');
 
 var routes = require('./routes/index');
 
@@ -29,7 +30,7 @@ app.use(session({
     secret: 'sdakljajlksJLWKCJslkjflkszjfdlbwezlfwfjklkfew'
 }));
 
-app.use('/', routes);
+app.use('/', flash(), routes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
