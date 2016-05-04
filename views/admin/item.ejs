@@ -1,0 +1,75 @@
+<html>
+<%- include ../partials/head.ejs %>
+<body>
+<div class="container">
+    <div class="well">
+        <% if (typeof error !== 'undefined') { %>
+        <div class="panel-body">
+            <div class="label label-danger">
+                <%- error.message %>
+            </div>
+        </div>
+        <% } %>
+        <form action="/admin/item" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Photo</label>
+                <input type="file" class="form-control" name="photo">
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="name">
+            </div>
+            <div class="form-group">
+                <label>Price (Big)</label>
+                <input type="text" class="form-control" name="priceBig">
+            </div>
+            <div class="form-group">
+                <label>Price (Small)</label>
+                <input type="text" class="form-control" name="priceSmall">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-default">ADD</button>
+            </div>
+        </form>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-sm-3">Phone</div>
+        <div class="col-sm-2">Name</div>
+        <div class="col-sm-3">Price</div>
+        <div class="col-sm-4">Action</div>
+    </div>
+    <% items.forEach(function(item) { %>
+    <div class="row" style="border: 1px solid #222;">
+        <form action="/admin/item/remove/<%- item.id %>" method="post">
+            <div class="col-sm-12 clearfix">
+                <button class="btn btn-danger pull-right">REMOVE</button>
+            </div>
+        </form>
+        <form action="/admin/item/update/<%- item.id %>" method="post" enctype="multipart/form-data">
+            <div class="col-sm-3 form-group">
+                <img src="/photo/<%- item.id %>" style="height: 80px; max-width: 120px;">
+                <input class="focus" name="photo" type="file">
+            </div>
+            <div class="col-sm-2 form-group">
+                <input name="name" type="text" class="form-control" value="<%- item.name %>">
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label>Big</label>
+                    <input class="form-control" name="priceBig" type="number" value="<%- item.price.big %>">
+                </div>
+                <div class="form-group">
+                    <label>Small</label>
+                    <input class="form-control" name="priceSmall" type="number" value="<%- item.price.small %>">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn btn-default">UPDATE</button>
+            </div>
+        </form>
+    </div>
+    <% }) %>
+</div>
+</body>
+</html>

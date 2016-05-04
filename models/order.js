@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 module.exports = {
-    name: 'order',
+    name: 'Order',
     schema: new Schema({
         vip: {
             type: Schema.Types.ObjectId,
