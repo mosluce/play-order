@@ -2,18 +2,95 @@
 <html>
 <%- include partials/head.ejs %>
 <body>
-    <div class="container">
-        <div class="page-header">
-            <h4>
+<div class="container">
+    <div class="page-header">
+        <h4>
             <%- include partials/welcome.ejs %>
-            </h4>
-            <ul class="breadcrumb">
-                <li>點餐</li>
-            </ul>
+        </h4>
+        <ul class="breadcrumb">
+            <li>點餐</li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <% if (typeof error !== 'undefined') { %>
+        <div class="col-sm-12">
+            <div class="label label-danger">
+                <%- error.message %>
+            </div>
+        </div>
+        <% } %>
+        <div class="col-sm-12">
+            <form action="/order" method="post">
+                <table class="table table-bordered table-condensed table-striped">
+                    <thead>
+                    <tr>
+                        <th style="width: 200px;">Photo</th>
+                        <th style="width: 120px;">Name</th>
+                        <th style="width: 100px;">Price</th>
+                        <th style="width: 100px;">Remain</th>
+                        <th>Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% items.forEach(function(item) { %>
+                    <tr>
+                        <td>
+                            <% if(item.photo) { %>
+                            <img src="/photo/<%- item.photo %>" class="item-photo">
+                            <% } else { %>
+                            <img src="/img/default.jpg" class="item-photo">
+                            <% } %>
+                        </td>
+                        <td>
+                            <%- item.name %>
+                        </td>
+                        <td>
+                            <p>
+                                BIG: <%- item.price.big %>
+                            </p>
+                            <p>
+                                SMALL: <%- item.price.small %>
+                            </p>
+                        </td>
+                        <td>
+                            <p>
+                                BIG: <%- item.amount.big %>
+                            </p>
+                            <p>
+                                SMALL: <%- item.amount.small %>
+                            </p>
+                        </td>
+                        <td>
+                            <input type="hidden" value="<%- item.id %>" name="id">
+                            <input type="hidden" value="<%- item.amount.big %>" name="maxBig">
+                            <input type="hidden" value="<%- item.amount.small %>" name="maxSmall">
+                            <input type="hidden" value="<%- item.name %>" name="name">
+
+                            <div class="form-group input-group">
+                                <span class="input-group-addon">BIG</span>
+                                <input class="form-control" type="number" max="<%- item.amount.big %>" name="amountBig"
+                                       value="0">
+                            </div>
+                            <div class="form-group input-group">
+                                <span class="input-group-addon">SMALL</span>
+                                <input class="form-control" type="number" max="<%- item.amount.small %>"
+                                       name="amountSmall" value="0">
+                            </div>
+                        </td>
+                    </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <div class="col-sm-12 clearfix">
+                        <button class="btn btn-default pull-right">ORDER</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-    <div class="row">
+</div>
 
-    </div>
 </body>
 </html>

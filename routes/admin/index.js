@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var pipe = require('../../pipe');
 var admin = pipe.admin('/admin/login');
+var jwt = require('jsonwebtoken');
+var config = require('../../config');
 
 router.use('/item', admin, require('./item'));
 router.use('/stock', admin, require('./stock'));
@@ -59,6 +61,9 @@ router.post('/login', function (req, res, next) {
         }
 
         req.session.admin = admin;
+        res.cookie('token', jwt.sign({adminId: admin.id}, config.secret), {
+            expires: new Date(Date.now() + 60*60*1000)
+        });
 
         return res.redirect('/admin/item');
     }).catch(function (err) {

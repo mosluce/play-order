@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var flash = require('./pipe/flash');
+var config = require('./config');
 
 var routes = require('./routes/index');
 
@@ -27,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'bower_components')));
 app.use(session({
     saveUninitialized: false,
     resave: false,
-    secret: 'sdakljajlksJLWKCJslkjflkszjfdlbwezlfwfjklkfew'
+    secret: config.secret
 }));
 
 app.use('/', flash(), routes);

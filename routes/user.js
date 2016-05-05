@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var jwt = require('jsonwebtoken');
+var config = require('../config');
 
 router.get('/login', function (req, res, next) {
     res.render('user/login', {
@@ -34,6 +36,9 @@ router.post('/login', function (req, res, next) {
         }
 
         req.session.user = user;
+        res.cookie('token', jwt.sign({userId: user.id}, config.secret), {
+            expires: new Date(Date.now() + 60*60*1000)
+        });
 
         res.redirect('/');
     });

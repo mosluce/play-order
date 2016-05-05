@@ -19,6 +19,13 @@ if(!fs.existsSync(photoDir)) {
 
 var routeRoot = '/admin/item';
 
+function checkFiletype(file) {
+
+    var pattern = /image\/.+/;
+
+    return pattern.test(file.mimetype);
+}
+
 router.get('/', function (req, res, next) {
     models.Item.find().exec().then(function(items) {
         res.render('admin/item', {
@@ -38,28 +45,28 @@ router.post('/', upload.single('photo'), function (req, res, next) {
         big: data.priceBig
     };
 
-    var pattern = /image\/.+/;
-
-    if(!pattern.test(file.mimetype)) {
-        return res.render('admin/item', {
-            title: 'Order::Admin::Item',
-            error: {
-                message: 'mimetype is not allow'
-            }
-        });
+    if(file && !checkFiletype(file)) {
+        return res.error('mimetype is not allow', routeRoot);
     }
 
     models.Item.create(data).then(function(item) {
-        fs.rename(file.path, path.join(photoDir, item.id), function(err) {
+        if(!file) {
+            return res.redirect(routeRoot);
+        }
+
+        fs.rename(file.path, path.join(photoDir, file.filename), function(err) {
             if(err) return next(err);
 
-            res.redirect(routeRoot);
+            item.photo = file.filename;
+            item.save().then(function() {
+                res.redirect(routeRoot);
+            });
         });
     });
 });
 
 //update
-router.post('/:id', upload.single('photo'), function (req, res, next) {
+router.post('/update/:id', upload.single('photo'), function (req, res, next) {
     var id = req.params.id;
 
     var file = req.file;
@@ -70,34 +77,25 @@ router.post('/:id', upload.single('photo'), function (req, res, next) {
         big: data.priceBig
     };
 
-    var pattern = /image\/.+/;
-
-    if(!pattern.test(file.mimetype)) {
-        return res.render('admin/item', {
-            title: 'Order::Admin::Item',
-            error: {
-                message: 'mimetype is not allow'
-            }
-        });
+    if(file && !checkFiletype(file)) {
+        return res.error('mimetype is not allow', routeRoot);
     }
     
     models.Item.findById(id).exec().then(function(item) {
-        if(!item) {
-            req.flash('error', {
-                message: '找不到要更新的物件'
-            });
-            return res.redirect(routeRoot);
-        }
-
         item = _.extend(item, data);
         return item.save();
     }).then(function(item) {
-        console.log(file.path, photoDir, item.id);
+        if(!file) {
+            return res.redirect(routeRoot);
+        }
 
-        fs.rename(file.path, path.join(photoDir, item.id), function(err) {
+        fs.rename(file.path, path.join(photoDir, file.filename), function(err) {
             if(err) return next(err);
 
-            res.redirect(routeRoot);
+            item.photo = file.filename;
+            item.save().then(function() {
+                res.redirect(routeRoot);
+            });
         });
     }).catch(next);
 });

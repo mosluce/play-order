@@ -15,15 +15,15 @@
             <form method="post" action="/admin/item" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Name</label>
-                    <input class="form-control" type="text" name="name">
+                    <input class="form-control" type="text" name="name" required>
                 </div>
                 <div class="form-group">
                     <label>Price(Big)</label>
-                    <input class="form-control" type="text" name="priceBig">
+                    <input class="form-control" type="number" name="priceBig" required>
                 </div>
                 <div class="form-group">
                     <label>Price(Small)</label>
-                    <input class="form-control" type="text" name="priceSmall">
+                    <input class="form-control" type="number" name="priceSmall" required>
                 </div>
                 <div class="form-group">
                     <label>Photo</label>
@@ -36,55 +36,81 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12">
-            <div class="row">
-                <div class="col-sm-3">Photo</div>
-                <div class="col-sm-3">Name</div>
-                <div class="col-sm-2">Price(Big)</div>
-                <div class="col-sm-2">Price(Small)</div>
-                <div class="col-sm-2">Action</div>
-            </div>
-            <% items.forEach(function(item) { %>
-            <div class="row">
-                <form class="delform" action="/admin/item/delete/<%- item.id %>" method="post">
-                    <div class="col-sm-12 clearfix">
-                        <button class="btn btn-danger pull-right">Del</button>
-                    </div>
-                </form>
-                <form action="/admin/item/<%- item.id %>" method="post" enctype="multipart/form-data">
-                    <div class="col-sm-3">
-                        <img src="/photo/<%- item.id %>" style="width: 100%; height: 100px;">
+        <form id="actionForm" method="post" enctype="multipart/form-data">
+            <table class="table table-bordered table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% items.forEach(function(item) { %>
+                <tr>
+                    <td width="200px">
+                        <% if(item.photo) { %>
+                        <img src="/photo/<%- item.photo %>" style="width: 100%; max-height: 100px;">
+                        <% } else { %>
+                        <img src="/img/default.jpg" style="width: 100%; max-height: 100px;">
+                        <% } %>
                         <input type="file" name="photo">
-                    </div>
-                    <div class="col-sm-3">
-                        <input type="text" name="name" class="form-control" value="<%- item.name %>">
-                    </div>
-                    <div class="col-sm-2">
-                        <input type="text" name="priceBig" class="form-control" value="<%- item.price.big %>">
-                    </div>
-                    <div class="col-sm-2">
-                        <input type="text" name="priceSmall" class="form-control" value="<%- item.price.small %>">
-                    </div>
-                    <div class="col-sm-2 clearfix">
-                        <button class="btn btn-default pull-right">Update</button>
-                    </div>
-                </form>
-            </div>
-            <% }) %>
-
-        </div>
+                    </td>
+                    <td>
+                        <input type="text" name="name" class="form-control" value="<%- item.name %>" required>
+                    </td>
+                    <td>
+                        <div class="form-group form-inline">
+                            <label>Big</label>
+                            <input type="number" name="priceBig" class="form-control" value="<%- item.price.big %>"
+                                   required>
+                        </div>
+                        <div class="form-group form-inline">
+                            <label>Small</label>
+                            <input type="number" name="priceSmall" class="form-control"
+                                   value="<%- item.price.small %>" required>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-default update" type="button" data-id="<%- item.id %>">
+                                UPDATE
+                            </button>
+                            <button class="btn btn-danger delete" type="button" data-id="<%- item.id %>">
+                                DELETE
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </form>
     </div>
 </div>
 <script>
     $(document).ready(function () {
-        var delform = $('.delform');
+        var actionForm = $('#actionForm');
+        var deleteBtn = $('.btn.delete');
+        var updateBtn = $('.btn.update');
 
-        delform.submit(function () {
-            if (!confirm('Are You Sure?')) {
+        deleteBtn.click(function () {
+            if (!confirm("are you sure?")) {
                 return false;
             }
+
+            actionForm.attr('action', '/admin/item/delete/' + $(this).attr('data-id'));
+            actionForm.removeAttr('enctype');
+            actionForm.submit();
         });
-    })
+
+        updateBtn.click(function () {
+            actionForm.attr('action', '/admin/item/update/' + $(this).attr('data-id'));
+            actionForm.attr('enctype', 'multipart/form-data');
+            actionForm.submit();
+        });
+    });
 </script>
 </body>
 </html>
