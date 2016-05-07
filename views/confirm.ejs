@@ -12,7 +12,112 @@
             <li>確認</li>
         </ul>
     </div>
-</div>
+    <div class="row">
+        <div class="col-sm-12">
+            <form action="/order/confirm"></form>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    點餐明細
+                </div>
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <td>Item (Price)</td>
+                            <td>Amount</td>
+                            <td>Price</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% order.list.forEach(function (l) { %>
+                        <tr>
+                            <td>
+                                <%- l.item.name %> (<%- l.item.price.big %> / <%- l.item.price.small %>)
+                            </td>
+                            <td>
+                                <span>Big: <%- l.amount.big %></span>
+                                <span>Small: <%- l.amount.small %></span>
+                            </td>
+                            <td>
+                                <span>Big: <%- l.amount.big * l.item.price.big %></span>
+                                <span>Small: <%- l.amount.small * l.item.price.small %></span>
+                            </td>
+                        </tr>
+                        <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-heading">
+                    取餐時間
+                </div>
+                <div class="panel-body">
 
+                </div>
+                <div class="panel-footer">
+                    <div class='input-group date' id='datetime'>
+                        <input type='text' class="form-control" name="datetime"/>
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var time = {
+            open: {
+                h: 12
+            },
+            close: {
+                h: 20
+            },
+            lastInterval: 30,
+            firstInterval: 15
+        }
+
+        var datetime = $('#datetime');
+        var now = new Date();
+        var open = new Date();
+        var close = new Date();
+        var last = close;
+
+        open.setHours(time.open.h);
+        open.setMinutes(time.open.m);
+        close.setHours(time.close.h);
+        close.setMinutes(time.close.m);
+        last.setMinutes(close.getMinutes() - time.lastInterval);
+
+        if (now > last) {
+//            alert('已超過線上可點餐時間');
+//            location.href = '/';
+        }
+
+        var minDate = open;
+        var maxDate = last;
+
+        if (now > open) {
+            minDate = now;
+        }
+
+        var minutes = minDate.getMinutes() + time.firstInterval;
+        minutes = Math.ceil(minutes / 5) * 5;
+
+        minDate.setMinutes(minutes);
+        minDate.setSeconds(0);
+
+        console.log(minDate);
+
+        datetime.datetimepicker({
+            format: 'YYYY/MM/DD HH:mm',
+            defaultDate: minDate,
+            stepping: 5,
+            sideBySide: true,
+            minDate: minDate
+        });
+    });
+</script>
 </body>
 </html>

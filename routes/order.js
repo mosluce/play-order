@@ -37,6 +37,7 @@ router.post('/', function (req, res, next) {
         }
     }
 
+    //檢查
     Promise.map(orders, function (o) {
         return new Promise(function (resolve, reject) {
 
@@ -47,21 +48,32 @@ router.post('/', function (req, res, next) {
                     });
                 }
 
-                item.amount.big -= o.amountBig;
-                item.amount.small -= o.amountSmall;
-
-                return item.save().then(resolve, reject);
+                resolve(item);
             });
         });
     }).then(function (items) {
+        //扣除
+        items.forEach(function (item, index) {
+            item.amount.big -= orders[index].amountBig;
+            item.amount.small -= orders[index].amountSmall;
+        });
+
+        return Promise.map(items, function(item) {
+            return item.save();
+        });
+    }).then(function (items) {
+        //建立訂單
         var list = [];
 
         for (var i in items) {
+            var o = orders[i];
+            var item = items[i];
+
             list.push({
-                item: items[i],
+                item: item,
                 amount: {
-                    big: orders[i].amountBig,
-                    small: orders[i].small
+                    big: o.amountBig,
+                    small: o.amountSmall
                 }
             });
         }
@@ -70,7 +82,7 @@ router.post('/', function (req, res, next) {
             list: list,
             vip: req.user
         }).then(function (order) {
-            req.flash('order', order);
+            req.session.order = order;
             res.redirect('/order/confirm');
         });
     }).catch(function(err) {
@@ -79,14 +91,15 @@ router.post('/', function (req, res, next) {
 });
 
 router.get('/confirm', function (req, res, next) {
-    var order = req.flash('order');
+    var order = req.session.order;
 
     if(!order) {
         return res.redirect('/order');
     }
 
     res.render('confirm', {
-        title: 'Confirm'
+        title: 'Confirm',
+        order: order
     });
 });
 
