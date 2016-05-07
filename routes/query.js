@@ -26,7 +26,7 @@ router.get('/', function (req, res, next) {
 
     models.Order.find({
         vip: req.session.user,
-        updatedAt: {
+        datetime: {
             $gte: start,
             $lte: end
         }

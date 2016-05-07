@@ -39,8 +39,14 @@
             <form action="/query/delete/<%- order.id %>" method="post">
                 <div class="label label-primary">
                     <%- moment(order.datetime).format('YYYY/MM/DD HH:mm') %>
+                    <% if(order.canceled) { %>
+                    <span class="label label-warning">已取消</span>
+                    <% } %>
+                    <% if(order.finished) { %>
+                    <span class="label label-primary">完成取餐</span>
+                    <% } %>
                     <% if(order.datetime > new Date()) { %>
-                        <button class="label label-danger pull-right">DEL</button>
+                    <button class="label label-danger pull-right">DEL</button>
                     <% } %>
                 </div>
             </form>

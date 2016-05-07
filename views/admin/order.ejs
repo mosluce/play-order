@@ -3,6 +3,118 @@
 <body>
 <div class="container">
     <%- include menu.ejs %>
+    <div class="row">
+        <div class="col-sm-12">
+            <form action="/admin/order" method="post">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        選擇查詢日期
+                    </div>
+                    <div class="panel-body">
+                        <div class="input-group" id="orderDate">
+                            <input type="text" class="form-control" name="queryDate"/>
+                            <span class="input-group-addon">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="panel-footer clearfix">
+                        <button class="btn btn-default pull-right">Query</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <% orders.forEach(function (order) { %>
+    <div class="row">
+        <div class="col-sm-12">
+            <form method="post" action="/admin/order/update/<%- order.id %>">
+
+                <%- moment(order.datetime).format('YYYY/MM/DD HH:mm') %>
+                <span class="label label-info">
+                    <%- order.vip.displayName %>
+                </span>
+
+                <% if(order.canceled) { %>
+                <span class="label label-warning">已取消</span>
+                <% } %>
+                <% if(order.finished) { %>
+                <span class="label label-primary">完成取餐</span>
+                <% } %>
+
+                <% if(order.datetime > new Date() && !order.canceled && !order.finished) { %>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-primary finish" data-id="<%- order.id %>">FINISH</button>
+                    <button type="button" class="btn btn-default cancel" data-id="<%- order.id %>">CANCEL</button>
+                </div>
+                <input type="hidden" name="action" class="action">
+                <% } %>
+            </form>
+            <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <% order.list.forEach(function (l) { %>
+                <tr>
+                    <td>
+                        <%- l.item.name %>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <% }) %>
 </div>
+<script>
+    var value = '<%- selectedDate %>'
+</script>
+<script>
+    function init() {
+        var minDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        var maxDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        var dtpicker = $('#orderDate > input');
+
+        dtpicker.datetimepicker({
+            timepicker: false,
+            minDate: minDate,
+            maxDate: maxDate,
+            value: value,
+            format: 'Y/m/d'
+        });
+
+        var finishBu = $('button.finish');
+        var cancelBu = $('button.cancel');
+
+        finishBu.click(function () {
+            var form = $(this).parent().parent();
+            var action = form.find('.action');
+
+            action.val('finish');
+
+            form.submit();
+        });
+
+        cancelBu.click(function () {
+            var form = $(this).parent().parent();
+            var action = form.find('.action');
+
+            action.val('cancel');
+
+            form.submit();
+        });
+    }
+
+    $(document).ready(init);
+</script>
 </body>
 </html>

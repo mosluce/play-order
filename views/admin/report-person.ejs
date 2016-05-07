@@ -1,0 +1,12 @@
+<html>
+<%- include ../partials/head.ejs %>
+<body>
+<div class="container">
+    <%- include menu.ejs %>
+    <% orders.forEach(function (o) { %>
+    <%- o.vip.displayName %>: <%- o.sum %>
+    <% }) %>
+</div>
+
+</body>
+</html>

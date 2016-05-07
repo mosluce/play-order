@@ -12,15 +12,17 @@ function looper(models) {
     var Item = models.Item;
 
     Order.find({
-        $or: [{
-            datetime: {
-                $lt: before30,
-                $ne: null
-            },
-            createdAt: {
-                $lt: before5
-            }
-        }]
+        $and: [{
+            $or: [{
+                datetime: {
+                    $lt: before30,
+                    $ne: null
+                },
+                createdAt: {
+                    $lt: before5
+                }
+            }]
+        }, {}]
     }).exec().then(function (orders) {
         Promise.map(orders, function (o) {
             return Promise.map(o.list, function (l) {
