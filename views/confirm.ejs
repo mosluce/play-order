@@ -14,110 +14,138 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <form action="/order/confirm"></form>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    點餐明細
-                </div>
-                <div class="panel-body">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <td>Item (Price)</td>
-                            <td>Amount</td>
-                            <td>Price</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <% order.list.forEach(function (l) { %>
-                        <tr>
-                            <td>
-                                <%- l.item.name %> (<%- l.item.price.big %> / <%- l.item.price.small %>)
-                            </td>
-                            <td>
-                                <span>Big: <%- l.amount.big %></span>
-                                <span>Small: <%- l.amount.small %></span>
-                            </td>
-                            <td>
-                                <span>Big: <%- l.amount.big * l.item.price.big %></span>
-                                <span>Small: <%- l.amount.small * l.item.price.small %></span>
-                            </td>
-                        </tr>
-                        <% }) %>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="panel-heading">
-                    取餐時間
-                </div>
-                <div class="panel-body">
-
-                </div>
-                <div class="panel-footer">
-                    <div class='input-group date' id='datetime'>
-                        <input type='text' class="form-control" name="datetime"/>
+            <form action="/order/confirm" method="post">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        點餐明細
+                    </div>
+                    <div class="panel-body">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <td>Item (Price)</td>
+                                <td>Amount</td>
+                                <td>Price</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% order.list.forEach(function (l) { %>
+                            <tr>
+                                <td>
+                                    <%- l.item.name %> (<%- l.item.price.big %> / <%- l.item.price.small %>)
+                                </td>
+                                <td>
+                                    <span>Big: <%- l.amount.big %></span>
+                                    <span>Small: <%- l.amount.small %></span>
+                                </td>
+                                <td>
+                                    <span>Big: <%- l.amount.big * l.item.price.big %></span>
+                                    <span>Small: <%- l.amount.small * l.item.price.small %></span>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel-heading">
+                        取餐時間
+                    </div>
+                    <div class="panel-body">
+                        <div class="input-group" id="datetime">
+                            <input type="text" class="form-control" name="datetime"/>
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
+                        </div>
+                    </div>
+                    <div class="panel-footer clearfix">
+                        <button class="btn btn-default pull-right">Confirm</button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
 <script>
-    $(document).ready(function () {
-        var time = {
-            open: {
-                h: 12
-            },
-            close: {
-                h: 20
-            },
-            lastInterval: 30,
-            firstInterval: 15
+    var time = {
+        open: {//開店時間
+            h: 12, m: 0
+        },
+        close: {//閉店時間
+            h: 20, m: 0
+        },
+        lastInterval: 30,
+        firstInterval: 15
+    };
+
+    const now = new Date();
+    var minDate = new Date(); //only date
+    var maxDate = new Date(); //only date
+    var close = new Date(), open = new Date(), first, last; //only time
+    var value = new Date();
+
+    function onSelectDate(date, $input) {
+        var dstr = moment(date).format('YYYYMMDD');
+        var nstr = moment(now).format('YYYYMMDD');
+        var minTime = new Date(first);
+        var value = new Date(date);
+
+        value.setHours(first.getHours());
+        value.setMinutes(first.getMinutes());
+
+        if (dstr === nstr) { //選擇的Date是今天
+            if (now > open) {
+                minTime = new Date();
+                minTime.setMinutes(Math.ceil(minTime.getMinutes() / 5) * 5 + 15);
+
+                value = new Date(minTime);
+            }
         }
 
-        var datetime = $('#datetime');
-        var now = new Date();
-        var open = new Date();
-        var close = new Date();
-        var last = close;
+        $input.datetimepicker('setOptions', {
+            value: value,
+            minTime: minTime
+        });
+    }
 
+    function init() {
         open.setHours(time.open.h);
         open.setMinutes(time.open.m);
         close.setHours(time.close.h);
         close.setMinutes(time.close.m);
+
+        first = new Date(open);
+        last = new Date(close);
+
+        first.setMinutes(open.getMinutes() + time.firstInterval);
         last.setMinutes(close.getMinutes() - time.lastInterval);
 
+        maxDate.setDate(now.getDate() + 1);
+
         if (now > last) {
-//            alert('已超過線上可點餐時間');
-//            location.href = '/';
+            minDate.setDate(minDate.getDate() + 1);
+
+            value = new Date(first);
+            value.setDate(minDate.getDate());
         }
 
-        var minDate = open;
-        var maxDate = last;
-
-        if (now > open) {
-            minDate = now;
-        }
-
-        var minutes = minDate.getMinutes() + time.firstInterval;
-        minutes = Math.ceil(minutes / 5) * 5;
-
-        minDate.setMinutes(minutes);
-        minDate.setSeconds(0);
-
-        console.log(minDate);
+        //http://xdsoft.net/jqplugins/datetimepicker/
+        var datetime = $('#datetime > input');
 
         datetime.datetimepicker({
-            format: 'YYYY/MM/DD HH:mm',
-            defaultDate: minDate,
-            stepping: 5,
-            sideBySide: true,
-            minDate: minDate
+            lang: 'zh-TW',
+            step: 5,
+            minDate: minDate,
+            maxDate: maxDate,
+            minTime: first,
+            maxTime: last,
+            onSelectDate: onSelectDate
         });
-    });
+
+        onSelectDate(value, datetime);
+    }
+
+    $(document).ready(init);
 </script>
 </body>
 </html>

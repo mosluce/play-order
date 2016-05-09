@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var pipe = require('../pipe');
 var auth = pipe.auth('/user/login');
-var Promise = require('bluebird')
+var Promise = require('bluebird');
+var moment = require('moment');
 
 router.use('/', auth);
 
@@ -58,7 +59,7 @@ router.post('/', function (req, res, next) {
             item.amount.small -= orders[index].amountSmall;
         });
 
-        return Promise.map(items, function(item) {
+        return Promise.map(items, function (item) {
             return item.save();
         });
     }).then(function (items) {
@@ -80,26 +81,62 @@ router.post('/', function (req, res, next) {
 
         Order.create({
             list: list,
-            vip: req.user
+            vip: req.session.user
         }).then(function (order) {
-            req.session.order = order;
+            // req.session.order = order;
+            res.cookie('orderId', order.id, {
+                expires: new Date(Date.now() + 10 * 60 * 1000)
+            });
             res.redirect('/order/confirm');
         });
-    }).catch(function(err) {
+    }).catch(function (err) {
         res.error(err.message, '/order');
     });
 });
 
 router.get('/confirm', function (req, res, next) {
-    var order = req.session.order;
+    var orderId = req.cookies.orderId;
 
-    if(!order) {
+    if (!orderId) {
         return res.redirect('/order');
     }
 
-    res.render('confirm', {
-        title: 'Confirm',
-        order: order
+    models.Order.findById(orderId).populate('list.item').exec().then(function (order) {
+        res.render('confirm', {
+            title: 'Confirm',
+            order: order
+        });
+    });
+});
+
+router.post('/confirm', function (req, res, next) {
+    var orderId = req.cookies.orderId;
+
+    if (!orderId) {
+        return res.redirect('/order');
+    }
+
+    var datetime = moment(req.body.datetime, 'YYYY/MM/DD HH:mm')._d;
+
+    models.Order.findByIdAndUpdate(orderId, {
+        $set: {
+            datetime: datetime
+        }
+    }).exec().then(function () {
+        res.redirect('/order/success');
+    }).catch(next);
+});
+
+router.get('/success', function (req, res, next) {
+    var orderId = req.cookies.orderId;
+
+    models.Order.findById(orderId).populate('list.item').exec().then(function (order) {
+        res.clearCookie('orderId', {});
+
+        res.render('success', {
+            title: 'Success',
+            order: order
+        });
     });
 });
 

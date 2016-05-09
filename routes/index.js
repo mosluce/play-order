@@ -29,6 +29,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.use('/order', require('./order'));
+router.use('/query', require('./query'));
 router.use('/admin', require('./admin'));
 router.use('/user', require('./user'));
 

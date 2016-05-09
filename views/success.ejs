@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<%- include partials/head.ejs %>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h4>
+            <%- include partials/welcome.ejs %>
+        </h4>
+        <ul class="breadcrumb">
+            <li>點餐</li>
+            <li>確認</li>
+            <li>訂餐成功</li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="duration">
+                還有<span></span>秒，返回首頁
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var duration = 30;
+
+    function countDown() {
+        var span = $('#duration > span');
+
+        span.text(duration);
+
+        duration--;
+
+        if (duration >= 0) {
+            setTimeout(countDown, 1000);
+        } else {
+            location.href = '/';
+        }
+    }
+
+    $(document).ready(function () {
+        countDown();
+    });
+</script>
+</body>
+</html>
