@@ -12,7 +12,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="input-group" id="orderDate">
-                            <input type="text" class="form-control" name="queryDate"/>
+                            <input type="text" class="form-control" name="queryDate" disabled />
                             <span class="input-group-addon">
                                 <i class="glyphicon glyphicon-calendar"></i>
                             </span>
@@ -112,6 +112,10 @@
 
             form.submit();
         });
+
+        $('.input-group .input-group-addon').click(function() {
+            dtpicker.datetimepicker('show');
+        })
     }
 
     $(document).ready(init);

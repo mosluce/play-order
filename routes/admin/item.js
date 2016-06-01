@@ -46,12 +46,19 @@ router.post('/', upload.single('photo'), function (req, res, next) {
     };
 
     if(file && !checkFiletype(file)) {
-        return res.error('mimetype is not allow', routeRoot);
+        // return res.error('mimetype is not allow', routeRoot);
+        return res.send({
+            success: false,
+            message: 'mimetype is not allow'
+        });
     }
 
     models.Item.create(data).then(function(item) {
         if(!file) {
-            return res.redirect(routeRoot);
+            // return res.redirect(routeRoot);
+            return res.send({
+                success: true
+            });
         }
 
         fs.rename(file.path, path.join(photoDir, file.filename), function(err) {
@@ -59,7 +66,10 @@ router.post('/', upload.single('photo'), function (req, res, next) {
 
             item.photo = file.filename;
             item.save().then(function() {
-                res.redirect(routeRoot);
+                // res.redirect(routeRoot);
+                res.send({
+                    success: true
+                });
             });
         });
     });
@@ -78,7 +88,11 @@ router.post('/update/:id', upload.single('photo'), function (req, res, next) {
     };
 
     if(file && !checkFiletype(file)) {
-        return res.error('mimetype is not allow', routeRoot);
+        // return res.error('mimetype is not allow', routeRoot);
+        return res.send({
+            success: false,
+            message: 'mimetype is not allow'
+        });
     }
     
     models.Item.findById(id).exec().then(function(item) {
@@ -86,7 +100,10 @@ router.post('/update/:id', upload.single('photo'), function (req, res, next) {
         return item.save();
     }).then(function(item) {
         if(!file) {
-            return res.redirect(routeRoot);
+            // return res.redirect(routeRoot);
+            return res.send({
+                success: true
+            });
         }
 
         fs.rename(file.path, path.join(photoDir, file.filename), function(err) {
@@ -94,7 +111,9 @@ router.post('/update/:id', upload.single('photo'), function (req, res, next) {
 
             item.photo = file.filename;
             item.save().then(function() {
-                res.redirect(routeRoot);
+                return res.send({
+                    success: true
+                });
             });
         });
     }).catch(next);
@@ -107,7 +126,9 @@ router.post('/delete/:id', function (req, res, next) {
     models.Item.findById(id).exec().then(function(item) {
         return item.remove();
     }).then(function() {
-        res.redirect(routeRoot);
+        return res.send({
+            success: true
+        });
     }).catch(next);
 });
 

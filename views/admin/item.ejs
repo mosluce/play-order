@@ -11,8 +11,8 @@
             </div>
         </div>
         <% } %>
-        <div class="col-sm-12">
-            <form method="post" action="/admin/item" enctype="multipart/form-data">
+        <div class="col-sm-12 createForm">
+            <!--<form method="post" action="/admin/item" enctype="multipart/form-data">-->
                 <div class="form-group">
                     <label>Name</label>
                     <input class="form-control" type="text" name="name" required>
@@ -30,13 +30,13 @@
                     <input class="form-control" type="file" name="photo">
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-primary pull-right">Add</button>
+                    <button class="btn btn-primary pull-right create" type="button">Add</button>
                 </div>
-            </form>
+            <!--</form>-->
         </div>
     </div>
     <div class="row">
-        <form id="actionForm" method="post" enctype="multipart/form-data">
+        <!--<form id="actionForm" method="post" enctype="multipart/form-data">-->
             <table class="table table-bordered table-condensed table-striped">
                 <thead>
                 <tr>
@@ -48,7 +48,7 @@
                 </thead>
                 <tbody>
                 <% items.forEach(function(item) { %>
-                <tr>
+                <tr class="item-<%- item.id %>">
                     <td width="200px">
                         <% if(item.photo) { %>
                         <img src="/photo/<%- item.photo %>" style="width: 100%; max-height: 100px;">
@@ -86,29 +86,111 @@
                 <% }) %>
                 </tbody>
             </table>
-        </form>
+        <!--</form>-->
     </div>
 </div>
 <script>
+    function create(data, cb) {
+        $.ajax('/admin/item', {
+            data: data,
+            processData: false,
+            contentType: false,
+            method: 'post',
+            success: function(response) {
+                if(response.success) {
+                    cb();
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
+    function update(id, data, cb) {
+        $.ajax('/admin/item/update/'+id, {
+            data: data,
+            processData: false,
+            contentType: false,
+            method: 'post',
+            success: function(response) {
+                if(response.success) {
+                    cb();
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
     $(document).ready(function () {
-        var actionForm = $('#actionForm');
         var deleteBtn = $('.btn.delete');
         var updateBtn = $('.btn.update');
+        var createBtn = $('.btn.create');
 
         deleteBtn.click(function () {
             if (!confirm("are you sure?")) {
                 return false;
             }
 
-            actionForm.attr('action', '/admin/item/delete/' + $(this).attr('data-id'));
-            actionForm.removeAttr('enctype');
-            actionForm.submit();
+            $(this).attr('disabled', 'disabled');
+            $(this).text('正在刪除中...');
+
+            var id = $(this).attr('data-id');
+
+            $.ajax('/admin/item/delete/'+id, {
+                method: 'post',
+                success: function(response) {
+                    if(response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            });
         });
 
         updateBtn.click(function () {
-            actionForm.attr('action', '/admin/item/update/' + $(this).attr('data-id'));
-            actionForm.attr('enctype', 'multipart/form-data');
-            actionForm.submit();
+            var id = $(this).attr('data-id');
+            var form = $('.item-'+id);
+
+            var data = new FormData();
+
+            $(this).attr('disabled', 'disabled');
+            $(this).text('正在更新中...');
+
+            data.append("name", form.find('input[name=name]').val());
+            data.append("priceSmall", form.find('input[name=priceSmall]').val());
+            data.append("priceBig", form.find('input[name=priceBig]').val());
+
+            if(form.find('input[name=photo]')[0].files[0])
+            {
+                data.append("photo", form.find('input[name=photo]')[0].files[0]);
+            }
+
+            update(id, data, function() {
+                location.reload();
+            });
+        });
+
+        createBtn.click(function () {
+            var form = $('.createForm');
+            var data = new FormData();
+
+            $(this).attr('disabled', 'disabled');
+            $(this).text('正在加入中...');
+
+            data.append("name", form.find('input[name=name]').val());
+            data.append("priceSmall", form.find('input[name=priceSmall]').val());
+            data.append("priceBig", form.find('input[name=priceBig]').val());
+
+            if(form.find('input[name=photo]')[0].files[0])
+            {
+                data.append("photo", form.find('input[name=photo]')[0].files[0]);
+            }
+
+            create(data, function () {
+                location.reload();
+            });
         });
     });
 </script>
